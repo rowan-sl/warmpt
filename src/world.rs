@@ -20,7 +20,7 @@ pub fn surounding(x: usize, y: usize, mx: usize, my: usize) -> Vec<(usize, usize
     res
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, PartialEq)]
 pub struct World<const X: usize, const Y: usize> {
     tiles: [[Tile; Y]; X],
 }
@@ -44,7 +44,9 @@ impl<const X: usize, const Y: usize> World<X, Y> {
                 match type_at {
                     Heat::Source {produced_per_tick} => {
                         for cord in surounding(x, y, X, Y) {
+                            // get the heat
                             let h = self.tiles[cord.0][cord.1].get_heat();
+                            // if the heat is less that the max produced, then increase that tiles heat by the produced ammount
                             if h < heat_at {
                                 self.tiles[cord.0][cord.1].set_heat(h + produced_per_tick);
                             }
@@ -52,25 +54,64 @@ impl<const X: usize, const Y: usize> World<X, Y> {
                     }
                     Heat::Sink {absorbed_per_tick} => {
                         for cord in surounding(x, y, X, Y) {
+                            // get the heat
                             let h = self.tiles[cord.0][cord.1].get_heat();
+                            // if the heat is larger than the current heat, take heat away
                             if h > heat_at {
                                 self.tiles[cord.0][cord.1].set_heat(h - absorbed_per_tick);
                             }
                         }
                     }
                     Heat::Conductor { rate } => {
+                        // percent of heat diff to cover every tick
+                        let rate_precent = rate / 100.0;
+                        // new heat after all operatoins
                         let mut new_heat_at = heat_at;
-                        let s = surounding(x, y, X, Y);
-                        let s_l = s.len();
-                        let transfer_per = rate / s_l as isize;
-                        for cord in s {
-                            let h = self.tiles[cord.0][cord.1].get_heat();
-                            if new_heat_at > h && new_heat_at - transfer_per >= h {
-                                let new_h = h + transfer_per;
-                                self.tiles[cord.0][cord.1].set_heat(new_h);
-                                new_heat_at -= transfer_per;
+                        // get the surrounding tiles
+                        let surrounding_cords = surounding(x, y, X, Y);
+                        // number of surrounding tiles
+                        let num_surrounding = surrounding_cords.len();
+                        // for each nearby tile
+                        for surrounding_tile in surrounding_cords {
+                            //get the heat of that tile
+                            let surrounding_tile_heat = self.tiles[surrounding_tile.0][surrounding_tile.1].get_heat();
+                            //get the difference in heat
+                            let heat_dif = new_heat_at - surrounding_tile_heat;
+
+                            if heat_dif > 0.0 {
+                                // if the other tiles heat is larger
+                                let mut change = heat_dif * rate_precent;
+                                // account for the number of nearby tiles heat will go to
+                                change /= num_surrounding as f32;
+
+                                // increase the heat by change, changing behavior if it is a sink or source
+                                match self.tiles[surrounding_tile.0][surrounding_tile.1].get_type() {
+                                    Heat::Conductor { .. } => {
+                                        self.tiles[surrounding_tile.0][surrounding_tile.1].set_heat(surrounding_tile_heat + change);
+                                    }
+                                    _ => {
+                                        //do nothing, as this satisfys the behavior of bolth sources and sinks
+                                    }
+                                }
+                                // decrease own heat
+                                new_heat_at -= change;
                             }
                         }
+                        // update the heat at the current tiles
+                        self.tiles[x][y].set_heat(new_heat_at);
+                        // let mut new_heat_at = heat_at;
+                        // let s = surounding(x, y, X, Y);
+                        // let s_l = s.len();
+                        // let transfer_per = rate / s_l as f32;
+                        // for cord in s {
+                        //     let h = self.tiles[cord.0][cord.1].get_heat();
+                        //     if new_heat_at > h && new_heat_at - transfer_per >= h {
+                        //         let new_h = h + transfer_per;
+                        //         self.tiles[cord.0][cord.1].set_heat(new_h);
+                        //         new_heat_at -= transfer_per;
+                        //     }
+                        // }
+                        // self.tiles[x][y].set_heat(new_heat_at);
                     }
                 }
             }
@@ -78,7 +119,7 @@ impl<const X: usize, const Y: usize> World<X, Y> {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, PartialEq)]
 pub struct WorldBuilder<const X: usize, const Y: usize> {
     world: World<X, Y>,
 }

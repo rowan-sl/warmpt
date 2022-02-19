@@ -3,7 +3,7 @@ use image::Rgb;
 use crate::heat::Heat;
 use crate::types::temp;
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, PartialEq)]
 pub struct Tile {
     mat_type: Heat,
     heat_energy: temp,
@@ -44,23 +44,23 @@ impl Tile {
     }
 
     pub const fn const_default() -> Self {
-        Self::new(Heat::Conductor { rate: 0 }, 0)
+        Self::new(Heat::Conductor { rate: 0.0 }, 0.0)
     }
 
 }
 
 impl Tile {
     pub fn view(&self, max_heat: temp) -> Rgb<u8> {
-        let heat_color_coef = 255f64 / max_heat as f64;
+        let heat_color_coef = 255f32 / max_heat;
         //loss of precision is intentional
-        let color = (heat_color_coef * self.heat_energy.abs() as f64) as u8;
+        let color = heat_color_coef * self.heat_energy.abs();
 
-        if self.heat_energy == 0 {
+        if self.heat_energy == 0.0 {
             Rgb::<_>([0; 3])
-        } else if self.heat_energy > 0 {
-            Rgb::<_>([color, 0, 0])
+        } else if self.heat_energy > 0.0 {
+            Rgb::<_>([color as u8, 0, 0])
         } else {
-            Rgb::<_>([0, 0, color])
+            Rgb::<_>([0, 0, color as u8])
         }
     }
 
