@@ -53,7 +53,11 @@ impl Tile {
     pub fn view(&self, max_heat: temp) -> Rgb<u8> {
         let heat_color_coef = 255f32 / max_heat;
         //loss of precision is intentional
-        let color = heat_color_coef * self.heat_energy.abs();
+        let mut color = heat_color_coef * self.heat_energy.abs();
+
+        if color > 255.0 {
+            color = 255.0;
+        }
 
         if self.heat_energy == 0.0 {
             Rgb::<_>([0; 3])
