@@ -38,7 +38,9 @@ impl Tile {
 
     pub const fn new_conductor(energy: temp, transfer_rate: temp) -> Self {
         Self {
-            mat_type: Heat::Conductor { rate: transfer_rate },
+            mat_type: Heat::Conductor {
+                rate: transfer_rate,
+            },
             heat_energy: energy,
         }
     }
@@ -46,7 +48,6 @@ impl Tile {
     pub const fn const_default() -> Self {
         Self::new(Heat::Conductor { rate: 0.0 }, 0.0)
     }
-
 }
 
 impl Tile {

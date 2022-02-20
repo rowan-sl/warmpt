@@ -15,6 +15,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "aae1277d39aeec15cb388266ecc24b11c80469deae6067e17a1a7aa9e5c1f234"
 
 [[package]]
+name = "anyhow"
+version = "1.0.54"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a99269dff3bc004caa411f38845c20303f1e393ca2bd6581576fa3a7f59577d"
+
+[[package]]
 name = "autocfg"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -291,6 +297,12 @@ name = "libc"
 version = "0.2.119"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1bf2e165bb3457c8e098ea76f3e3bc9db55f87aa90d52d0e6be741470916aaa4"
+
+[[package]]
+name = "linked-hash-map"
+version = "0.5.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7fb9b38af92608140b86b693604b9ffcc5824240a484d1ecd4795bacb2fe88f3"
 
 [[package]]
 name = "lock_api"
@@ -593,8 +605,10 @@ checksum = "8ccb82d61f80a663efe1f787a51b16b5a51e3314d6ac365b08639f52387b33f3"
 name = "warmpt"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "image",
  "stati",
+ "yaml-rust",
 ]
 
 [[package]]
@@ -727,3 +741,12 @@ name = "windows_x86_64_msvc"
 version = "0.32.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "504a2476202769977a040c6364301a3f65d0cc9e3fb08600b2bda150a0488316"
+
+[[package]]
+name = "yaml-rust"
+version = "0.4.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "56c1936c4cc7a1c9ab21a1ebb602eb942ba868cbd44a99cb7cdc5892335e1c85"
+dependencies = [
+ "linked-hash-map",
+]
